@@ -184,6 +184,7 @@ public:
 	Vector				m_vecAutoAim;
 	BOOL				m_fOnTarget;
 	int					m_iDeaths;
+	int					m_iRespawnFrames;	// used in PlayerDeathThink() to make sure players can always respawn
 	float				m_flDeathAnimationStartTime;	// used in PlayerDeathThink() to make sure players can always respawn
 
 	int m_lastx, m_lasty;  // These are the previous update's crosshair angles, DON"T SAVE/RESTORE
@@ -332,7 +333,7 @@ public:
 	BOOL m_bPutInServer;	// we set it after PutInServer finished
 	BOOL m_bIsBot;			// we set it at PutInServer start
 	BOOL IsConnected() { return m_bConnected; }
-	void Disconnect() { m_bConnected = FALSE; m_bPutInServer = FALSE; m_bIsBot = FALSE; }
+	void Disconnect() { m_bConnected = FALSE; m_bPutInServer = FALSE; m_bIsBot = FALSE; m_bInWelcomeCam = FALSE; }
 
 	Vector m_vecLastViewAngles;
 

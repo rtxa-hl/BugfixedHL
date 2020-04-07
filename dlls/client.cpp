@@ -815,6 +815,8 @@ void PlayerPostThink( edict_t *pEntity )
 
 	if (pPlayer)
 		pPlayer->PostThink( );
+
+	serverapi()->PlayerPostThink(pEntity);
 }
 
 
@@ -1333,6 +1335,11 @@ int AddToFullPack( struct entity_state_s *state, int e, edict_t *ent, edict_t *h
 
 		state->usehull      = ( ent->v.flags & FL_DUCKING ) ? 1 : 0;
 		state->health		= ent->v.health;
+	}
+
+	if (ent->v.renderfx == kRenderFxDeadPlayer) {
+		state->movetype = MOVETYPE_NONE;
+		state->solid = SOLID_NOT;
 	}
 
 	return 1;
