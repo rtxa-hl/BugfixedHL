@@ -1120,9 +1120,10 @@ void CBaseHudChat::StartMessageMode( int iMessageModeType )
 	m_pChatInput->SetMouseInputEnabled( true );
 
 	//Place the mouse cursor near the text so people notice it.
-	int x, y, w, h;
-	GetChatHistory()->GetBounds( x, y, w, h );
-	vgui2::input()->SetCursorPos( x + ( w/2), y + (h/2) );
+	int x, y, w, h, chatx, chaty;
+	GetPos(chatx, chaty);
+	GetChatHistory()->GetBounds(x, y, w, h);
+	vgui2::input()->SetCursorPos(chatx + x + (w / 2), chaty + y + (h / 2));
 
 	m_flHistoryFadeTime = vgui2::system()->GetCurrentTime() + CHAT_HISTORY_FADE_TIME;
 
@@ -1348,11 +1349,8 @@ void CBaseHudChatLine::InsertAndColorizeText( wchar_t *buf, int clientIndex )
 		{
 			int pos = str - m_text;
 
-			// Reset color after player name to default.
-			// Only reset color on player messages and if there were no colorcodes
-			// (allows players to change color of their messages)
-			if (pos == m_iNameStart + m_iNameLength &&
-				is_player_msg && m_textRanges.Count() == 2)		// The only color is player name
+			// Reset color after player name to default
+			if (pos == m_iNameStart + m_iNameLength && is_player_msg)	// The only color is player name
 			{
 				TextRange range;
 				range.start = pos;
@@ -1372,7 +1370,7 @@ void CBaseHudChatLine::InsertAndColorizeText( wchar_t *buf, int clientIndex )
 				int idx = *(buf2 + 1) - '0';
 				if (idx == 0 || idx == 9)
 				{
-					if (pos <= m_iNameStart + m_iNameLength)
+					if (pos <= m_iNameStart + m_iNameLength && is_player_msg)
 						range.color = pChat->GetTextColorForClient(COLOR_PLAYERNAME, clientIndex);
 					else
 						range.color = pChat->GetTextColorForClient(COLOR_NORMAL, clientIndex);
@@ -1761,6 +1759,12 @@ void CBaseHudChatEntry::OnKeyCodeTyped(vgui2::KeyCode code)
 			{
 				PostMessage(m_pHudChat, new KeyValues("ChatEntrySend"));
 			}
+
+			// HACK: Pressing ENTER key for some reason sometimes bugs the mouse:
+			// it stays on even after SetMouseInputEnabled(false)
+			gHUD.CallOnNextFrame([]() {
+				vgui2::surface()->CalculateMouseVisible();
+			});
 		}
 
 		// End message mode.

@@ -49,11 +49,13 @@ public:
 	CScorePanel(IViewport *pParent);
 	virtual ~CScorePanel();
 
+	void InitHudData();
 	void FullUpdate();
 	void UpdateClientInfo(int client, bool autoUpdate = true);	// autoUpdate - whether to update player count and resize at the end of client update
 	void UpdateAllClients();
 	void EnableMousePointer(bool enable);
 	void UpdateServerName();
+	void DeathMsg(int killer, int victim);
 
 	//IViewportPanel overrides
 	const char *GetName() override
@@ -66,6 +68,7 @@ public:
 	void Update() override {}
 	virtual void ApplySchemeSettings(vgui2::IScheme *pScheme);
 	virtual void OnKeyCodeTyped(vgui2::KeyCode code);
+	virtual void OnThink();
 
 	bool NeedsUpdate() override
 	{
@@ -107,7 +110,6 @@ public:
 private:
 	struct team_info_t
 	{
-		char name[MAX_TEAM_NAME] = { 0 };
 		int kills = 0;	// Calculated kills
 		int deaths = 0;	// Calculated deaths
 		int players = 0;// Number of players
@@ -161,6 +163,11 @@ private:
 	int m_pClientTeams[MAX_PLAYERS + 1];
 	std::unordered_map<std::string, team_score_t> m_mTeamNameToScore;
 
+	SDK_Color m_ThisPlayerBgColor = SDK_Color(0, 0, 0, 0);
+	SDK_Color m_KillerBgColor = SDK_Color(0, 0, 0, 0);
+	int m_iKillerIndex = -1;
+	float m_flKillerHighlightStart = 0;
+
 	menu_info_t m_pMenuInfo;
 
 	void RecalcItems();
@@ -197,6 +204,8 @@ private:
 
 	void SetSortByFrags();
 	void SetSortByEff();
+
+	SDK_Color GetPlayerBgColor(int idx);
 
 	static bool StaticPlayerSortFuncByFrags(CPlayerListPanel *list, int itemID1, int itemID2);
 	static bool StaticPlayerSortFuncByEff(CPlayerListPanel *list, int itemID1, int itemID2);

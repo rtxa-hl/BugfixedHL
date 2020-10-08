@@ -217,8 +217,11 @@ bool CGameVersion::operator>(const CGameVersion &rhs) const
 	if (res)
 		return true;
 
+	if (semver_compare_version(rhs.m_SemVer, m_SemVer) == 1)
+		return false;
+
 	// Check for "dev" tag. "dev" is always >
-	return strcmp("dev", m_SemVer.prerelease) == 0;
+	return (m_SemVer.prerelease && strcmp("dev", m_SemVer.prerelease) == 0);
 }
 
 bool CGameVersion::operator<(const CGameVersion &rhs) const
@@ -232,8 +235,11 @@ bool CGameVersion::operator>=(const CGameVersion &rhs) const
 	if (res)
 		return true;
 
+	if (semver_compare_version(rhs.m_SemVer, m_SemVer) == 1)
+		return false;
+
 	// Check for "dev" tag. "dev" is always >
-	return strcmp("dev", m_SemVer.prerelease) == 0;
+	return (m_SemVer.prerelease && strcmp("dev", m_SemVer.prerelease) == 0);
 }
 
 bool CGameVersion::operator<=(const CGameVersion &rhs) const
